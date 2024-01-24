@@ -1,15 +1,45 @@
 <html>
+
 <head>
     <title>Number Comparison</title>
 </head>
-<body>
-Hello, there! How are you?
 
-<form id="numberForm">
-        <input type="number" name="number1" placeholder="Enter first number">
+<body>
+    Hello, there! How are you?
+
+    <ul style="aaa">
+        <li>A</li>
+        <li>B</li>
+        <ul>
+            <li>CA</li>
+            <li>CB</li>
+            <li>CC</li>
+        </ul>
+    </ul>
+
+    <form id="numberForm">
+        <input type="number" id="number1" placeholder="Enter first number">
         <input type="number" name="number2" placeholder="Enter second number">
         <button type="submit">Submit</button>
-</form>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        var message = "Hello, there;"
+        document.getElementById('result').innerText = message;
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('numberForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                var number1 = document.getElementById('number1').value;
+                var message = "Submit was clicked." + number1;
+                document.getElementById('result').innerText = message;
+            });
+            var message = "We are ready to go.";
+            document.getElementById('result').innerText = message;
+        });
+    </script>
 
 </body>
+
 </html>
