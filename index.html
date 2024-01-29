@@ -3,40 +3,34 @@
 <head>
     <title>Number Comparison</title>
 </head>
+    <div id="area54">
 
-<body>
-    Hello, there! How are you?
-
-    <ul style="aaa">
-        <li>A</li>
-        <li>B</li>
-        <ul>
-            <li>CA</li>
-            <li>CB</li>
-            <li>CC</li>
-        </ul>
-    </ul>
-
+    </div>
     <form id="numberForm">
         <input type="number" id="number1" placeholder="Enter first number">
-        <input type="number" name="number2" placeholder="Enter second number">
-        <button type="submit">Submit</button>
+        <input type="number" id="number2" placeholder="Enter second number">
+        <button id="submit_button" type="submit">Compare</button>
     </form>
 
     <div id="result"></div>
 
     <script>
-        var message = "Hello, there;"
-        document.getElementById('result').innerText = message;
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('numberForm').addEventListener('submit', function (event) {
                 event.preventDefault();
                 var number1 = document.getElementById('number1').value;
-                var message = "Submit was clicked." + number1;
+                var number2 = document.getElementById('number2').value;
+                if (number1 > number2) {
+                    var message = "First number is greater than second number.";
+                } else if (number1 < number2) {
+                    var message = "First number is less than second number.";
+                } else {
+                    var message = "First number is equal to second number.";
+                }
                 document.getElementById('result').innerText = message;
+                document.getElementById('submit_button').disabled = true;
+                document.getElementById('area54').innerHTML = '<form id="numberForm"><input type="number" id="number11" placeholder="Enter first number"><input type="number" id="number12" placeholder="Enter second number"><button id="submit_button" type="submit">Compare</button></form>';
             });
-            var message = "We are ready to go.";
-            document.getElementById('result').innerText = message;
         });
     </script>
 
