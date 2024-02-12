@@ -19,3 +19,6 @@ The examples are in topic directories in the repository.
     - Storing data to localStorage
     - Retreiving data from localStorage
 
+- Topic-02-movie-list
+    - Getting information from Ajax
+    
