@@ -17,6 +17,10 @@ def get_goodbye():
     me = "Dr D."
     return f"<p>Goodbye, {me} from the World! Come back soon!</p>"
 
+@app.route("/whatever")
+def get_whatever():
+    return f"<p>I really don't have any strong feelings about that.</p>"
+
 @app.route("/data")
 def get_data():
     data = [
