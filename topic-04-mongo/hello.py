@@ -23,6 +23,11 @@ def get_data_movies_scifi():
     print(data)
     return jsonify(data)
 
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', "index.html")
+
+
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory('.', path)
