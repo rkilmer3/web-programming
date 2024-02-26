@@ -31,4 +31,4 @@ scifi_collection.delete_many({})
 scifi_collection.insert_many(classic_sci_fi_movies)
 
 # make sure the movies are there
-scifi_collection.count_documents({})
+print(scifi_collection.count_documents({}))
