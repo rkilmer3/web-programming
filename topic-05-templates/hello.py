@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, send_from_directory
 from mongita import MongitaClientDisk
 
 # create a mongita client connection
@@ -15,23 +15,44 @@ def get_data_movies_scifi():
     #     data = json.load(f)
     # open the scifi collection
     scifi_collection = movie_db.scifi_collection
-    data = list(scifi_collection.find({}))
+    data = list(scifi_collection.find({})) 
     for item in data:
         del item["_id"] 
     return jsonify(data)
 
-@app.route('/')
-def serve_index():
-    return send_from_directory('.', "index.html")
+@app.route("/hello")
+@app.route("/hello/<name>")
+def get_hello(name="guest"):
+    return render_template("hello.html", names=[name,"Alpha","Beta","Gamma"])
 
-@app.route("/movies")
-def get_movies():
+@app.route("/movies2")
+@app.route("/movies2/<keyword>")
+def get_movies2(keyword=None):
     scifi_collection = movie_db.scifi_collection
-    data = list(scifi_collection.find({}))
+    if keyword:
+        data = list(scifi_collection.find({"title": keyword}))
+    else:
+        data = list(scifi_collection.find({}))
     for item in data:
         del item["_id"] 
-    movies = jsonify(data)
-    return render_template("movies.html", movies)
+    return render_template("movies.html", movies=data)
+
+
+@app.route("/movies")
+@app.route("/movies/<keyword>")
+def get_movies(keyword=None):
+    scifi_collection = movie_db.scifi_collection
+    data = list(scifi_collection.find({})) 
+    for item in data:
+        del item["_id"] 
+    if keyword:
+#        data = [item for item in data if keyword in item['plot']]
+        filtered_data = []
+        for item in data:
+            if keyword in item['plot']:
+                filtered_data.append(item)
+        data = filtered_data
+    return render_template("movies.html", movies=data)
 
 @app.route('/<path:path>')
 def serve_static(path):
