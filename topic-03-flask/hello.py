@@ -29,6 +29,11 @@ def get_data():
     ]
     return jsonify(data)
 
+@app.route("/whatever")
+def get_whatever():
+    me = "Rosa"
+    return f"<p>THIS IS MY UNITED STATES OF WHATEVER.</p>"
+
 @app.route("/api/status")
 def get_status():
     data = [
