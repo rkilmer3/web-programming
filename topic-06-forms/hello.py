@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, #redirect
 
 app = Flask(__name__)
 
@@ -20,4 +20,5 @@ def post_hello():
         "password":password
     }
     return render_template("hello.html", data=data)
+    # usually do a redirect('....')
 
