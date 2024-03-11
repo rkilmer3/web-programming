@@ -28,6 +28,27 @@ def get_quotes():
     # display the data
     return render_template("quotes.html", data=data)
 
+
+@app.route("/add", methods=["GET"])
+def get_add():
+    return render_template("add_quote.html")
+
+@app.route("/add", methods=["POST"])
+def post_add():
+    text = request.form.get("text", "")
+    author = request.form.get("author", "")
+    if text != "" and author != "":
+        # open the quotes collection
+        quotes_collection = quotes_db.quotes_collection
+        #insert the quote
+        quote_data = {
+            "text":text,
+            "author":author
+        }
+        quotes_collection.insert_one(quote_data)
+    # usually do a redirect('....')
+    return redirect("/quotes")
+
 @app.route("/delete", methods=["GET"])
 @app.route("/delete/<id>", methods=["GET"])
 def get_delete(id=None):
