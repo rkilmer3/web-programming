@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from mongita import MongitaClientDisk
 from bson import ObjectId
 
@@ -22,12 +22,10 @@ def get_quotes():
     quotes_collection = quotes_db.quotes_collection
     # load the data
     data = list(quotes_collection.find({}))
-    print(data)
-    print(data)
     for item in data:
         item["_id"] = str(item["_id"])
         item["object"] = ObjectId(item["_id"])
-    print(data)
+    # display the data
     return render_template("quotes.html", data=data)
 
 @app.route("/delete", methods=["GET"])
@@ -37,14 +35,8 @@ def get_delete(id=None):
         # open the quotes collection
         quotes_collection = quotes_db.quotes_collection
         # delete the item
-#        quotes_collection.delete_one(_id=ObjectId(id))
-
-# TODO: explain the fix to the old code here:
-        # data = list(quotes_collection.find({_id:ObjectId(id)}))
-        # the key here is to write _Python_ code, not semi-JS
-        data = list(quotes_collection.find({"_id":ObjectId(id)}))
-        print(data)
-# TODO: redirect here! 
-    return render_template("quotes.html", data=data)
+        quotes_collection.delete_one({"_id":ObjectId(id)})
+    # return to the quotes page
+    return redirect("/quotes")
 
 
