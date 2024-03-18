@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, make_response, request, redirect
 from mongita import MongitaClientDisk
 from bson import ObjectId
 
@@ -10,10 +10,36 @@ client = MongitaClientDisk()
 # open the quotes database
 quotes_db = client.quotes_db
 
+import random
+import string
+
+
+def generate_random_string(length):
+    # Choose from letters and digits
+    characters = string.ascii_letters + string.digits
+    # Generate a random string
+    random_string = "".join(random.choice(characters) for i in range(length))
+    return random_string
+
+
+# Example: Generate a 10-character random string
+print(generate_random_string(10))
+
+import uuid
+
+# Generate a random UUID (GUID-like)
+session_key = uuid.uuid4()
+
+print(session_key)
+
 
 @app.route("/", methods=["GET"])
 @app.route("/quotes", methods=["GET"])
 def get_quotes():
+    number_of_visits = int(request.cookies.get("number_of_visits", "0"))
+    session_id = request.cookies.get("session_id", str(uuid.uuid4()))
+    print(f"number of visits {number_of_visits}")
+    print(f"session_key {session_key}")
     # open the quotes collection
     quotes_collection = quotes_db.quotes_collection
     # load the data
@@ -22,7 +48,10 @@ def get_quotes():
         item["_id"] = str(item["_id"])
         item["object"] = ObjectId(item["_id"])
     # display the data
-    return render_template("quotes.html", data=data)
+    html = render_template("quotes.html", data=data, session_id=session_id)
+    response = make_response(html)
+    response.set_cookie("number_of_visits", str(number_of_visits + 1))
+    return response
 
 
 @app.route("/add", methods=["GET"])
