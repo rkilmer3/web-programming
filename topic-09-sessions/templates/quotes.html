@@ -1,10 +1,16 @@
 <html>
+    <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    </head>
     <body>
         <h1>Quotes</h1>
         <hr>
         <table>
             {% for item in data %}
             <tr>
+                <td>
+                    [{{item["owner"]}}]
+                </td>
                 <td>
                     {{item["text"]}}
                 </td>
@@ -14,8 +20,8 @@
                 </td>
                 <td>
                     [
-                    <a href="/edit/{{item['_id']}}">{{item["_id"]}}</a>
-                    <a href="/delete/{{item['_id']}}">{{item["_id"]}}</a>
+                    <a href="/edit/{{item['_id']}}"><i class="material-icons">mode_edit</i></a>
+                    <a href="/delete/{{item['_id']}}"><i class="material-icons">delete</i></a>
                     ]
                 </td>
             </tr>
@@ -23,10 +29,6 @@
         </table>
         <hr/>
         <a href="/add">Add a new quote!</a>
-        <hr />
-        You have been here {{number_of_visits}} times!
-        <hr />
-        Session ID = {{session_id}} times!
         <hr />
         User = {{user}} (<a href="/logout">Logout</a>)
     </body>
