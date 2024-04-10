@@ -9,6 +9,7 @@ client = MongitaClientDisk()
 
 # open the quotes database
 quotes_db = client.quotes_db
+session_db = client.session_db
 
 import uuid
 
@@ -25,8 +26,12 @@ def get_quotes():
     if not session_id:
         response = redirect("/login")
         return response
-    user = request.cookies.get("user", "unknown user")
     number_of_visits = int(request.cookies.get("number_of_visits", "0"))
+
+    session_data = list(session_collection.find({"session_id": session_id}))
+    assert len(session_data) == 1
+    session_data == session_data[0]
+    user = session_data.get("user","unknown user")
     # open the quotes collection
     quotes_collection = quotes_db.quotes_collection
     # load the data
@@ -51,12 +56,18 @@ def get_login():
 
 @app.route("/login", methods=["POST"])
 def post_login():
-    response = redirect("/quotes")
-    session_id = str(uuid.uuid4())
-    response.set_cookie("session_id", session_id)
     user = request.form.get("user", "")
-    response.set_cookie("user", user)
+    session_id = str(uuid.uuid4())
+    # open the session collection
+    session_collection = session_db.session_collection
+    # insert the user
+    session_collection.delete({"session_id": session_id})
+    session_data = {"session_id": session_id, "user": user}
+    session_collection.insert_one(session_data)
+    response = redirect("/quotes")
+    response.set_cookie("session_id", session_id)
     return response
+
 
 @app.route("/logout", methods=["GET"])
 def get_logout():
