@@ -13,12 +13,6 @@ session_db = client.session_db
 
 import uuid
 
-# Generate a random UUID (GUID-like)
-session_key = uuid.uuid4()
-
-print(session_key)
-
-
 @app.route("/", methods=["GET"])
 @app.route("/quotes", methods=["GET"])
 def get_quotes():
@@ -26,33 +20,43 @@ def get_quotes():
     if not session_id:
         response = redirect("/login")
         return response
-    number_of_visits = int(request.cookies.get("number_of_visits", "0"))
-
+    # open the session collection
+    session_collection = session_db.session_collection
+    # get the data for this session
     session_data = list(session_collection.find({"session_id": session_id}))
+    if len(session_data) == 0:
+        response = redirect("/logout")
+        return response
     assert len(session_data) == 1
-    session_data == session_data[0]
-    user = session_data.get("user","unknown user")
+    session_data = session_data[0]
+    # get some information from the session
+    user = session_data.get("user", "unknown user")
     # open the quotes collection
     quotes_collection = quotes_db.quotes_collection
     # load the data
-    data = list(quotes_collection.find({}))
+    data = list(quotes_collection.find({"owner":user}))
     for item in data:
         item["_id"] = str(item["_id"])
         item["object"] = ObjectId(item["_id"])
     # display the data
-    html = render_template("quotes.html", data=data, number_of_visits=number_of_visits, session_id=session_id, user=user)
+    html = render_template(
+        "quotes.html",
+        data=data,
+        user=user,
+    )
     response = make_response(html)
-    response.set_cookie("number_of_visits", str(number_of_visits + 1))
     response.set_cookie("session_id", session_id)
     return response
+
 
 @app.route("/login", methods=["GET"])
 def get_login():
     session_id = request.cookies.get("session_id", None)
-    print("Pre-login session id = ",session_id)
+    print("Pre-login session id = ", session_id)
     if session_id:
         return redirect("/quotes")
     return render_template("login.html")
+
 
 @app.route("/login", methods=["POST"])
 def post_login():
@@ -61,7 +65,7 @@ def post_login():
     # open the session collection
     session_collection = session_db.session_collection
     # insert the user
-    session_collection.delete({"session_id": session_id})
+    session_collection.delete_one({"session_id": session_id})
     session_data = {"session_id": session_id, "user": user}
     session_collection.insert_one(session_data)
     response = redirect("/quotes")
@@ -71,6 +75,13 @@ def post_login():
 
 @app.route("/logout", methods=["GET"])
 def get_logout():
+    # get the session id
+    session_id = request.cookies.get("session_id", None)
+    if session_id:
+        # open the session collection
+        session_collection = session_db.session_collection
+        # delete the session
+        session_collection.delete_one({"session_id": session_id})
     response = redirect("/login")
     response.delete_cookie("session_id")
     return response
@@ -91,13 +102,24 @@ def post_add():
     if not session_id:
         response = redirect("/login")
         return response
+    # open the session collection
+    session_collection = session_db.session_collection
+    # get the data for this session
+    session_data = list(session_collection.find({"session_id": session_id}))
+    if len(session_data) == 0:
+        response = redirect("/logout")
+        return response
+    assert len(session_data) == 1
+    session_data = session_data[0]
+    # get some information from the session
+    user = session_data.get("user", "unknown user")
     text = request.form.get("text", "")
     author = request.form.get("author", "")
     if text != "" and author != "":
         # open the quotes collection
         quotes_collection = quotes_db.quotes_collection
         # insert the quote
-        quote_data = {"text": text, "author": author}
+        quote_data = {"owner": user, "text": text, "author": author}
         quotes_collection.insert_one(quote_data)
     # usually do a redirect('....')
     return redirect("/quotes")
@@ -137,6 +159,7 @@ def post_edit():
         data = quotes_collection.update_one({"_id": ObjectId(_id)}, values)
     # do a redirect('....')
     return redirect("/quotes")
+
 
 @app.route("/delete", methods=["GET"])
 @app.route("/delete/<id>", methods=["GET"])
