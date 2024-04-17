@@ -64,7 +64,7 @@ def post_login():
     user = request.form.get("user", "")
     # open the user collection
     user_collection = user_db.user_collection
-    # look for user
+    # look for the user
     user_data = list(user_collection.find({"user": user}))
     if len(user_data) != 1:
         response = redirect("/login")
