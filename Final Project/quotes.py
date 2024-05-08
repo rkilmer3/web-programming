@@ -233,17 +233,35 @@ def get_delete(id=None):
     # return to the quotes page
     return redirect("/quotes")
 
-@app.route("/comment", methods =["GET"])
-@app.route("/delete/<id>", methods=["GET"])
-def get_comments(id = None):
+from bson.objectid import ObjectId
+
+@app.route("/comments/<quote_id>", methods=["GET"])
+def get_comments(quote_id):
     session_id = request.cookies.get("session_id", None)
     if not session_id:
         response = redirect("/login")
         return response
-    if id:
-        # open the quotes collection
-        comments_collection = comments_db.comments_collection
-        # delete the item
-        comments_collection.add_one({"_id": ObjectId(id)})
+    # open the comments collection
+    comments_collection = comments_db.comments_collection
+    # get the comments for the quote
+    comments = list(comments_collection.find({"quote_id": ObjectId(quote_id)}))
+    # return the comments in the desired format (this is just a placeholder)
+    return {"comments": comments}
+
+@app.route("/comment", methods=["POST"])
+def post_comment():
+    session_id = request.cookies.get("session_id", None)
+    if not session_id:
+        response = redirect("/login")
+        return response
+    # get the form data
+    quote_id = request.form.get("quote_id", "")
+    text = request.form.get("text", "")
+    # open the comments collection
+    comments_collection = comments_db.comments_collection
+    # insert the comment
+    if quote_id and text:
+        comment_data = {"quote_id": ObjectId(quote_id), "text": text}
+        comments_collection.insert_one(comment_data)
     # return to the quotes page
     return redirect("/quotes")

@@ -29,11 +29,12 @@
         <tr>
             <td colspan="4">
                 <h3>Comments</h3>
-                <div id="comments_{{item['_id']}}">
-                    <!-- Existing comments will be inserted here -->
-                </div>
-                <form id="commentForm_{{item['_id']}}">
-                    <textarea id="commentText_{{item['_id']}}" placeholder="Add a comment"></textarea><br>
+                {% for comment in item['comments'] %}
+                    <div>{{comment['user']}}: {{comment['text']}}</div>
+                {% endfor %}
+                <form action="/comment" method="post">
+                    <input type="hidden" name="quote_id" value="{{item['_id']}}">
+                    <textarea name="text" placeholder="Add a comment"></textarea><br>
                     <button type="submit">Submit</button>
                 </form>
             </td>
