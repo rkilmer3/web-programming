@@ -1,35 +1,48 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    </head>
-    <body>
-        <h1>Quotes</h1>
-        <hr>
-        <table>
-            {% for item in data %}
-            <tr>
-                <td>
-                    [{{item["owner"]}}]
-                </td>
-                <td>
-                    {{item["text"]}}
-                </td>
-                <td>
-                    <em>--</em>
-                    <em>{{item["author"]}}</em>
-                </td>
-                <td>
-                    [
-                    <a href="/edit/{{item['_id']}}"><i class="material-icons">mode_edit</i></a>
-                    <a href="/delete/{{item['_id']}}"><i class="material-icons">delete</i></a>
-                    ]
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        <hr/>
-        <a href="/add">Add a new quote!</a>
-        <hr />
-        User = {{user}} (<a href="/logout">Logout</a>)
-    </body>
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+    <h1>Quotes</h1>
+    <hr>
+    <table>
+        {% for item in data %}
+        <tr>
+            <td>
+                [{{item["owner"]}}]
+            </td>
+            <td>
+                {{item["text"]}}
+            </td>
+            <td>
+                <em>--</em>
+                <em>{{item["author"]}}</em>
+            </td>
+            <td>
+                [
+                <a href="/edit/{{item['_id']}}"><i class="material-icons">mode_edit</i></a>
+                <a href="/delete/{{item['_id']}}"><i class="material-icons">delete</i></a>
+                ]
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <h3>Comments</h3>
+                <div id="comments_{{item['_id']}}">
+                    <!-- Existing comments will be inserted here -->
+                </div>
+                <form id="commentForm_{{item['_id']}}">
+                    <textarea id="commentText_{{item['_id']}}" placeholder="Add a comment"></textarea><br>
+                    <button type="submit">Submit</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <hr/>
+    <a href="/add">Add a new quote!</a>
+    <hr />
+    User = {{user}} (<a href="/logout">Logout</a>)
+</body>
 </html>
