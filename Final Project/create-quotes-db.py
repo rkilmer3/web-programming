@@ -25,7 +25,7 @@ quotes_collection.insert_many(quotes_data)
 # make sure the quotes are there
 print(quotes_collection.count_documents({}))
 
-###################
+##################################################
 # Create a comments database
 comments_db = client.comments_db
 

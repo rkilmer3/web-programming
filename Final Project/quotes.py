@@ -12,6 +12,7 @@ client = MongitaClientDisk()
 
 # open the quotes database
 quotes_db = client.quotes_db
+comments_db = client.comments_db
 session_db = client.session_db
 user_db = client.user_db
 
@@ -229,5 +230,20 @@ def get_delete(id=None):
         quotes_collection = quotes_db.quotes_collection
         # delete the item
         quotes_collection.delete_one({"_id": ObjectId(id)})
+    # return to the quotes page
+    return redirect("/quotes")
+
+@app.route("/comment", methods =["GET"])
+@app.route("/delete/<id>", methods=["GET"])
+def get_comments(id = None):
+    session_id = request.cookies.get("session_id", None)
+    if not session_id:
+        response = redirect("/login")
+        return response
+    if id:
+        # open the quotes collection
+        comments_collection = comments_db.comments_collection
+        # delete the item
+        comments_collection.add_one({"_id": ObjectId(id)})
     # return to the quotes page
     return redirect("/quotes")
