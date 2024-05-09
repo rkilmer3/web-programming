@@ -2,7 +2,7 @@
 import json
 
 classic_sci_fi_movies = [
-    {"title": "Blade Runner", "year": 1982, "director": "Ridley Scott", "plot": "In a dystopian future, a blade runner must pursue and terminate four replicants who stole a ship in space and have returned to Earth to find their creator."},
+    {"title": "Sonic 2", "year": 2022, "director": "The one guy", "plot": "Sonic 2 features Sonic and Tails fighting Knuckles and Dr. Eggman over the Master Emerald."},
     {"title": "2001: A Space Odyssey", "year": 1968, "director": "Stanley Kubrick", "plot": "The film follows a voyage to Jupiter with the sentient computer HAL after the discovery of a mysterious monolith affecting human evolution."},
     {"title": "Metropolis", "year": 1927, "director": "Fritz Lang", "plot": "In a futuristic city sharply divided between the working class and the city planners, the son of the city's mastermind falls in love with a working-class prophet who predicts the coming of a savior to mediate their differences."},
     {"title": "The Day the Earth Stood Still", "year": 1951, "director": "Robert Wise", "plot": "An alien lands and tells the people of Earth that they must live peacefully or be destroyed as a danger to other planets."},

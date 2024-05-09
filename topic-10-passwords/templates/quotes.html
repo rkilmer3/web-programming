@@ -18,12 +18,14 @@
                     <em>--</em>
                     <em>{{item["author"]}}</em>
                 </td>
+                {if {{item["owner"]}} == {{user}} }
                 <td>
                     [
                     <a href="/edit/{{item['_id']}}"><i class="material-icons">mode_edit</i></a>
                     <a href="/delete/{{item['_id']}}"><i class="material-icons">delete</i></a>
                     ]
                 </td>
+                {endif}
             </tr>
             {% endfor %}
         </table>

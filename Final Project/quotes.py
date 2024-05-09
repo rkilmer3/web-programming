@@ -40,7 +40,7 @@ def get_quotes():
     # open the quotes collection
     quotes_collection = quotes_db.quotes_collection
     # load the data
-    data = list(quotes_collection.find({"owner": user}))
+    data = list(quotes_collection.find({"owner": user, "public": False}))
     publicdata = list(quotes_collection.find({"public": True}))
     data = data + publicdata
     for item in data:
