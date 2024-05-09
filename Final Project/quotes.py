@@ -171,12 +171,12 @@ def post_add():
     text = request.form.get("text", "")
     author = request.form.get("author", "")
     public = request.form.get("public", "") == "on"
-    comments = request.form.get("comments", "") == "on"
+    replies = request.form.get("replies", "") == "on"
     if text != "" and author != "":
         # open the quotes collection
         quotes_collection = quotes_db.quotes_collection
         # insert the quote
-        quote_data = {"owner": user, "text": text, "author": author, "public":public, "comments":comments}
+        quote_data = {"owner": user, "text": text, "author": author, "public":public, "replies":replies}
         print(quote_data)
         quotes_collection.insert_one(quote_data)
     # usually do a redirect('....')
