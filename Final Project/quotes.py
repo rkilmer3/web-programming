@@ -171,11 +171,12 @@ def post_add():
     text = request.form.get("text", "")
     author = request.form.get("author", "")
     public = request.form.get("public", "") == "on"
+    comments = request.form.get("comments", "") == "on"
     if text != "" and author != "":
         # open the quotes collection
         quotes_collection = quotes_db.quotes_collection
         # insert the quote
-        quote_data = {"owner": user, "text": text, "author": author, "public":public}
+        quote_data = {"owner": user, "text": text, "author": author, "public":public, "comments":comments}
         print(quote_data)
         quotes_collection.insert_one(quote_data)
     # usually do a redirect('....')
@@ -188,11 +189,23 @@ def get_edit(id=None):
     if not session_id:
         response = redirect("/login")
         return response
+    # get the data for this session
+    session_collection = session_db.session_collection
+    session_data = list(session_collection.find({"session_id": session_id}))
+    if len(session_data) == 0:
+        response = redirect("/logout")
+        return response
+    assert len(session_data) == 1
+    session_data = session_data[0]
+    user = session_data.get("user", "unknown user")
     if id:
         # open the quotes collection
         quotes_collection = quotes_db.quotes_collection
         # get the item
-        data = quotes_collection.find_one({"_id": ObjectId(id)})
+        data = quotes_collection.find_one({"_id": ObjectId(id), "owner": user})
+        if data["owner"] != user:
+            print("Redirected")
+            return redirect("/quotes")
         data["id"] = str(data["_id"])
         return render_template("edit_quote.html", data=data)
     # return to the quotes page
@@ -225,9 +238,20 @@ def get_delete(id=None):
     if not session_id:
         response = redirect("/login")
         return response
+    session_collection = session_db.session_collection
+    session_data = list(session_collection.find({"session_id": session_id}))
+    if len(session_data) == 0:
+        response = redirect("/logout")
+        return response
+    assert len(session_data) == 1
+    session_data = session_data[0]
+    user = session_data.get("user", "unknown user")
     if id:
         # open the quotes collection
         quotes_collection = quotes_db.quotes_collection
+        data = quotes_collection.find_one({"_id": ObjectId(id), "owner": user})
+        if data["owner"] != user:
+            return redirect("/quotes")
         # delete the item
         quotes_collection.delete_one({"_id": ObjectId(id)})
     # return to the quotes page
@@ -265,3 +289,5 @@ def post_comment():
         comments_collection.insert_one(comment_data)
     # return to the quotes page
     return redirect("/quotes")
+
+#@app.route("/search", methods=["GET"])

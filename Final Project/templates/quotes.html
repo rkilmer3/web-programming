@@ -6,6 +6,10 @@
 <body>
     <h1>Quotes</h1>
     <hr>
+    <div class="topnav">
+        <input type="text" placeholder="Search..">
+        <button type="submit">Search</button>
+      </div>
     <table>
         {% for item in data %}
         <tr>
@@ -23,6 +27,7 @@
                 [
                 <a href="/edit/{{item['_id']}}"><i class="material-icons">mode_edit</i></a>
                 <a href="/delete/{{item['_id']}}"><i class="material-icons">delete</i></a>
+                <a href="/comments/{{item['_id']}}"><i class="material-icons">reply</i></a>
                 ]
             </td>
         </tr>
