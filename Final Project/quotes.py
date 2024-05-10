@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response, redirect
+from flask import Flask, render_template, request, make_response, redirect, jsonify
 from mongita import MongitaClientDisk
 from bson import ObjectId
 
@@ -28,6 +28,7 @@ def get_quotes():
         return response
     # open the session collection
     session_collection = session_db.session_collection
+    comments_collection = comments_db.comments_collection
     # get the data for this session
     session_data = list(session_collection.find({"session_id": session_id}))
     if len(session_data) == 0:
@@ -46,6 +47,8 @@ def get_quotes():
     for item in data:
         item["_id"] = str(item["_id"])
         item["object"] = ObjectId(item["_id"])
+        comments = list(comments_collection.find({"quote_id": item["_id"]}))
+        item["comments"] = comments
     # display the data
     html = render_template(
         "quotes.html",
@@ -278,6 +281,17 @@ def post_comment():
     if not session_id:
         response = redirect("/login")
         return response
+    # open the session collection
+    session_collection = session_db.session_collection
+    # get the data for this session
+    session_data = list(session_collection.find({"session_id": session_id}))
+    if len(session_data) == 0:
+        response = redirect("/logout")
+        return response
+    assert len(session_data) == 1
+    session_data = session_data[0]
+    # get some information from the session
+    user = session_data.get("user", "unknown user")
     # get the form data
     quote_id = request.form.get("quote_id", "")
     text = request.form.get("text", "")
@@ -285,9 +299,37 @@ def post_comment():
     comments_collection = comments_db.comments_collection
     # insert the comment
     if quote_id and text:
-        comment_data = {"quote_id": ObjectId(quote_id), "text": text}
+        comment_data = {"quote_id": str(ObjectId(quote_id)), "text": text, "user": user}  # include the user in the comment data
         comments_collection.insert_one(comment_data)
     # return to the quotes page
     return redirect("/quotes")
-
-#@app.route("/search", methods=["GET"])
+@app.route("/delete_comment", methods=["POST"])
+def delete_comment():
+    session_id = request.cookies.get("session_id", None)
+    if not session_id:
+        response = redirect("/login")
+        return response
+    # open the session collection
+    session_collection = session_db.session_collection
+    # get the data for this session
+    session_data = list(session_collection.find({"session_id": session_id}))
+    if len(session_data) == 0:
+        response = redirect("/logout")
+        return response
+    assert len(session_data) == 1
+    session_data = session_data[0]
+    # get some information from the session
+    user = session_data.get("user", "unknown user")
+    # get the form data
+    comment_id = request.json.get("comment_id", "")
+    # open the comments collection
+    comments_collection = comments_db.comments_collection
+    # get the comment
+    comment = comments_collection.find_one({"_id": ObjectId(comment_id)})
+    # get the quote
+    quotes_collection = quotes_db.quotes_collection
+    quote = quotes_collection.find_one({"_id": ObjectId(comment['quote_id'])})
+    # delete the comment if the user made the comment or owns the quote
+    if comment and quote and (user == comment['user'] or user == quote['owner']):
+        comments_collection.delete_one({"_id": ObjectId(comment_id)})
+    return jsonify({"success": True})

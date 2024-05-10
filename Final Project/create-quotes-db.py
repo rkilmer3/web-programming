@@ -43,17 +43,19 @@ comments_data = [
 
 # Put the comments in the database
 comments_collection.insert_many(comments_data)
+comment_data = {"quote_id": str(ObjectId(quote_id)), "text": text, "user": user}
+comments_collection.insert_one(comment_data)
 
 # Make sure the comments are there
 print(comments_collection.count_documents({}))
 
 # Function to add a comment to a quote
-def add_comment(quote_id, comment):
-    quote = quotes_collection.find_one({"_id": quote_id})
-    if quote and not quote.get('comments_prohibited', False):
-        comments_collection.insert_one(comment)
-    else:
-        print("Comments are prohibited on this quote.")
+#def add_comment(quote_id, comment):
+ #   quote = quotes_collection.find_one({"_id": quote_id})
+  #  if quote and not quote.get('comments_prohibited', False):
+   #     comments_collection.insert_one(comment)
+    #else:
+     #   print("Comments are prohibited on this quote.")
 
 # Function to prohibit comments on a quote
 def prohibit_comments(quote_id):

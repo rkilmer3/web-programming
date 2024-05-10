@@ -6,10 +6,6 @@
 <body>
     <h1>Quotes</h1>
     <hr>
-    <div class="topnav">
-        <input type="text" placeholder="Search..">
-        <button type="submit">Search</button>
-      </div>
     <table>
         {% for item in data %}
         <tr>
@@ -27,7 +23,6 @@
                 [
                 <a href="/edit/{{item['_id']}}"><i class="material-icons">mode_edit</i></a>
                 <a href="/delete/{{item['_id']}}"><i class="material-icons">delete</i></a>
-                <a href="/comments/{{item['_id']}}"><i class="material-icons">reply</i></a>
                 ]
             </td>
         </tr>
@@ -35,9 +30,12 @@
             <td colspan="4">
                 <h3>Comments</h3>
                 {% for comment in item['comments'] %}
-                    <div>{{comment['user']}}: {{comment['text']}}</div>
-                {% endfor %}
-                <form action="/comment" method="post">
+                <div>
+                    {{comment['user']}}: {{comment['text']}}
+                    <button class="delete-comment" data-comment-id="{{comment['_id']}}">Delete</button>
+                </div>
+            {% endfor %}
+                <form id="commentForm" method="post">
                     <input type="hidden" name="quote_id" value="{{item['_id']}}">
                     <textarea name="text" placeholder="Add a comment"></textarea><br>
                     <button type="submit">Submit</button>
@@ -50,5 +48,39 @@
     <a href="/add">Add a new quote!</a>
     <hr />
     User = {{user}} (<a href="/logout">Logout</a>)
+    <script>
+        document.getElementById('commentForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // prevent the form from being submitted normally
+        
+            var formData = new FormData(this);  // get the form data
+        
+            fetch('/comment', {  // send a POST request to the /comment route
+                method: 'POST',
+                body: formData
+            })
+            .then(function() {
+                location.reload();  // reload the page
+            });
+        });
+        </script>
+        <script>
+            document.querySelectorAll('.delete-comment').forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    var commentId = this.getAttribute('data-comment-id');
+            
+                    fetch('/delete_comment', {  // send a POST request to the /delete_comment route
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({comment_id: commentId}),
+                    })
+                    .then(function() {
+                        location.reload();  // reload the page
+                    });
+                });
+            });
+            </script>
+            
 </body>
 </html>
