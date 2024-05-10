@@ -303,6 +303,7 @@ def post_comment():
         comments_collection.insert_one(comment_data)
     # return to the quotes page
     return redirect("/quotes")
+
 @app.route("/delete_comment", methods=["POST"])
 def delete_comment():
     session_id = request.cookies.get("session_id", None)
@@ -333,3 +334,41 @@ def delete_comment():
     if comment and quote and (user == comment['user'] or user == quote['owner']):
         comments_collection.delete_one({"_id": ObjectId(comment_id)})
     return jsonify({"success": True})
+
+@app.route("/search/", methods=["POST"])
+def get_search():
+    searchString = request.form.get("searchString", "")
+    session_id = request.cookies.get("session_id", None)
+    if not session_id:
+        response = redirect("/login")
+        return response
+    session_collection = session_db.session_collection
+    # get the data for this session
+    session_data = list(session_collection.find({"session_id": session_id}))
+    if len(session_data) == 0:
+        response = redirect("/logout")
+        return response
+    assert len(session_data) == 1
+    session_data = session_data[0]
+    # Get User data
+    user = session_data.get("user", "unknown user")
+    # open the quotes collection
+    quotes_collection = quotes_db.quotes_collection
+    # load the data
+    data = list(quotes_collection.find({"owner": user, "public": False}))
+    publicdata = list(quotes_collection.find({"public": True}))
+    data = data + publicdata
+    filteredData = []
+    for item in data:
+        print(item)
+        if item["text"].find(searchString) != -1:
+            filteredData.append(item)
+    data = filteredData
+    print(data)
+    html= render_template(
+        "search.html",
+        data = data
+    )
+    response = make_response(html)
+    response.set_cookie("session_id", session_id)
+    return response
